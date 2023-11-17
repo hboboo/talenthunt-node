@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const schema = new mongoose.Schema({
-  name: String,
+  companyName: String,
   financing: {
     type: String,
     enum: ['未融资','天使轮','A轮','B轮','C轮','上市']
@@ -22,7 +22,7 @@ const schema = new mongoose.Schema({
   },
   rest_weekend: {
     type: String,
-    enum: ['双休','单休','大小周','单休']
+    enum: ['双休','单休','大小周']
   },
   overtime: {
     type: String,
