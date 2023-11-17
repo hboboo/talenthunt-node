@@ -18,11 +18,15 @@ const shema = new mongoose.Schema({
     type: String,
     enum: ['在校生','应届生','1年以内','1-3年','3-5年','5-10年','10年以上']
   },
-  education: {
+  job_education: {
     type: String,
     enum: ['初中以下', '中专', '高中', '大专', '本科', '硕士', '博士']
   },
-  recruiter: String
+  recruiter: String,
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+  },
 })
 
 module.exports = mongoose.model('Job', shema)

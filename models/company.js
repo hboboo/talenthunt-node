@@ -28,8 +28,8 @@ const schema = new mongoose.Schema({
     type: String,
     enum: ['不加班','偶尔加班','经常加班']
   },
-  company_address: [String],
-  company_introduction: [String]
+  company_address: String,
+  company_introduction: String
 })
 
 module.exports = mongoose.model('Company', schema)
