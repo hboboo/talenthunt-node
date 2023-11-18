@@ -50,7 +50,7 @@ router.post('/login', async function (req, res) {
       const token = jwt.sign({ username, role: user.role }, SECRET_KEY, {
         expiresIn: '1h'
       })
-      return res.status(200).json({message: '登录成功', token})
+      return res.status(200).json({message: '登录成功', token, role: user.role})
     } else {
       return res.status(401).json({message: '密码错误'})
     }
