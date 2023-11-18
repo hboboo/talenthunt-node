@@ -29,7 +29,8 @@ const schema = new mongoose.Schema({
     enum: ['不加班','偶尔加班','经常加班']
   },
   company_address: String,
-  company_introduction: String
+  company_introduction: String,
+  companyLogo: String,  // 新添加的公司标志字段
 })
 
 module.exports = mongoose.model('Company', schema)
