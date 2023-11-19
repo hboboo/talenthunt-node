@@ -48,7 +48,7 @@ router.post('/', upload.single('userLogo'), async function (req, res) {
     });
 
     await newUser.save();
-    res.send('添加成功');
+    res.status(200).json({message: '注册成功'})
   } catch (error) {
     console.error('错误', error.message);
     res.status(500).json({ error: '服务器错误', message: error.message });
@@ -77,12 +77,11 @@ router.post('/login', async function (req, res) {
       const token = jwt.sign({ account, role: user.role }, SECRET_KEY, {
         expiresIn: '1h',
       });
-      return res.status(200).json({ message: '登录成功', token, role: user.role });
+      return res.status(200).json({ message: '登录成功', token, role: user.role, userId: user._id });
     } else {
       return res.status(401).json({ message: '密码错误' });
     }
   } catch (error) {
-    console.error('错误', error.message);
     return res.status(401).json({ message: '服务器失败' });
   }
 });

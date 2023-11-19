@@ -17,7 +17,7 @@ app.use('/uploads/avatars', express.static(path.join(__dirname, 'public/uploads/
 
 app.use('/uploads/userLog', express.static(path.join(__dirname, 'public/uploads/userLog')));
 
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/uploads/companyLog', express.static(path.join(__dirname, 'public/uploads/companyLog')));
 
 
 app.listen(3000, () => {

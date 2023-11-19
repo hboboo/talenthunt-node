@@ -9,7 +9,7 @@ const Company = require('../models/company')
 // 设置 Multer，指定存储目录和文件名
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads/'); // 上传的文件存储在 uploads 目录
+    cb(null, 'public/uploads/companyLog'); // 上传的文件存储在 uploads 目录
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -47,13 +47,14 @@ router.post('/', upload.single('companyLogo'), async function (req, res) {
       end,
       rest_weekend,
       overtime,
+      userId
     } = req.body;
 
     // 解构上传的文件数据
     const companyLogo = req.file;
 
     // 保存文件的路径，供前端访问
-    const companyLogoPath = companyLogo ? `/uploads/${companyLogo.filename}` : '';
+    const companyLogoPath = companyLogo ? `/uploads/companyLog/${companyLogo.filename}` : '';
 
     // 创建Company模型实例
     const company = new Company({
@@ -91,6 +92,7 @@ router.post('/', upload.single('companyLogo'), async function (req, res) {
       job_experience,
       recruiter,
       company: savedCompany._id,
+      userId
     });
 
     // 保存Job模型实例到数据库
