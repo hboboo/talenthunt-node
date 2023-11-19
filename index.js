@@ -15,6 +15,8 @@ routes(app)
 
 app.use('/uploads/avatars', express.static(path.join(__dirname, 'public/uploads/avatars')));
 
+app.use('/uploads/userLog', express.static(path.join(__dirname, 'public/uploads/userLog')));
+
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 

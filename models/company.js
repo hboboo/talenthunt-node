@@ -30,7 +30,7 @@ const schema = new mongoose.Schema({
   },
   company_address: String,
   company_introduction: String,
-  companyLogo: String,  // 新添加的公司标志字段
+  companyLogo: String,  
 })
 
 module.exports = mongoose.model('Company', schema)

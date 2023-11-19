@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const schema = new mongoose.Schema({
-  username: {
+  account: {
     type: String,
     required: true
   },
@@ -13,7 +13,12 @@ const schema = new mongoose.Schema({
     type: String,
     enum: ['recruiter', 'jobSeeker'],
     required: true
-  }
+  },
+  username: {
+    type: String,
+    required: true
+  },
+  userLogo: String,
 })
 
 module.exports = mongoose.model('User', schema)
