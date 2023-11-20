@@ -116,4 +116,29 @@ router.get('/info', async function (req, res) {
   }
 });
 
+//根据id查询用户数据
+router.post('/userId', async function (req, res) {
+  try {
+    const userId = req.body.userId;
+
+    // 根据userId从数据库中获取用户详细信息
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: '用户未找到' });
+    }
+
+    // 返回用户详细信息
+    res.status(200).json({
+      role: user.role,
+      username: user.username,
+      userLogo: user.userLogo,
+      // 根据需要添加其他用户信息字段
+    });
+  } catch (error) {
+    console.error('错误', error.message);
+    return res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
+
 module.exports = router

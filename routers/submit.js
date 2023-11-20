@@ -56,6 +56,13 @@ router.post('/', upload.single('companyLogo'), async function (req, res) {
     // 保存文件的路径，供前端访问
     const companyLogoPath = companyLogo ? `/uploads/companyLog/${companyLogo.filename}` : '';
 
+     // 解析岗位标签为数组
+     const parsedJobTag = JSON.parse(job_tag);
+     // 解析工作职责为数组
+     const parsedJobResponsibility = JSON.parse(job_responsibility);
+     // 解析任职要求为数组
+     const parsedJobRequire = JSON.parse(job_require);
+
     // 创建Company模型实例
     const company = new Company({
       companyName,
@@ -85,9 +92,9 @@ router.post('/', upload.single('companyLogo'), async function (req, res) {
       city,
       district,
       short_company_name,
-      job_tag,
-      job_responsibility,
-      job_require,
+      job_tag: parsedJobTag,
+      job_responsibility: parsedJobResponsibility,
+      job_require: parsedJobRequire,
       job_education,
       job_experience,
       recruiter,
