@@ -29,5 +29,19 @@ router.get('/:id', async function(req, res) {
   }
 });
 
+//获取岗位
+router.post('/', async function(req, res) {
+  try {
+    const jobId = req.body.jobId;
+
+    // 查询指定 jobId 的工作信息
+    const data = await Job.findById(jobId).populate('company');
+
+    res.send(data);
+  } catch (error) {
+    res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
+
 
 module.exports = router

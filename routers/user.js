@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const router = express.Router()
 const User = require('../models/user')
+const Job = require('../models/job')
 const multer = require('multer');
 const path = require('path');
 const SECRET_KEY = 'asd546as65f46dg4dsfajhsgdak'; //临时定义的常量，实际应该为唯一环境变量
@@ -133,8 +134,64 @@ router.post('/userId', async function (req, res) {
       role: user.role,
       username: user.username,
       userLogo: user.userLogo,
-      // 根据需要添加其他用户信息字段
+      collectId: user.collectId
     });
+  } catch (error) {
+    console.error('错误', error.message);
+    return res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
+
+// 收藏路由
+router.post('/addJobToCollection', async function (req, res) {
+  try {
+    const { userId, jobId } = req.body;
+
+    // 检查用户和工作是否存在
+    const user = await User.findById(userId);
+    const job = await Job.findById(jobId);
+
+    if (!user || !job) {
+      return res.status(404).json({ message: '用户或工作未找到' });
+    }
+
+    // 如果工作 id 不存在于用户的收藏列表中，才添加
+    if (!user.collectId.includes(job._id)) {
+      user.collectId.push(job._id);
+
+      // 保存更新后的用户信息
+      await user.save();
+
+      res.status(200).json({ message: '成功将工作添加到收藏夹' });
+    } else {
+      res.status(200).json({ message: '工作已在收藏夹中' });
+    }
+  } catch (error) {
+    console.error('错误', error.message);
+    return res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
+
+
+// 取消收藏接口
+router.post('/removeJobFromCollection', async function (req, res) {
+  try {
+    const { userId, jobId } = req.body;
+
+    // 检查用户是否存在
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: '用户未找到' });
+    }
+
+    // 从用户的收藏列表中移除指定的工作 id
+    user.collectId = user.collectId.filter(collectId => collectId.toString() !== jobId);
+
+    // 保存更新后的用户信息
+    await user.save();
+
+    res.status(200).json({ message: '成功取消收藏' });
   } catch (error) {
     console.error('错误', error.message);
     return res.status(500).json({ error: '服务器错误', message: error.message });

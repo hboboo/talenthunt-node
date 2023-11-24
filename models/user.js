@@ -19,6 +19,10 @@ const schema = new mongoose.Schema({
     required: true
   },
   userLogo: String,
+  collectId: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Job'
+  }]
 })
 
 module.exports = mongoose.model('User', schema)
