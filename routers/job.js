@@ -43,5 +43,18 @@ router.post('/', async function(req, res) {
   }
 });
 
+//搜索岗位
+router.post('/search', async function(req, res) {
+  try {
+    const keyword = req.body.keyword;
+
+    // 使用正则表达式实现模糊搜索，i 表示不区分大小写
+    const data = await Job.find({ jobname: { $regex: new RegExp(keyword, 'i') } }).populate('company');
+
+    res.send(data);
+  } catch (error) {
+    res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
 
 module.exports = router
