@@ -59,7 +59,6 @@ router.post('/search', async function(req, res) {
 
 
 //筛选岗位
-// 用于筛选工作的POST API
 router.post('/filtrate', async (req, res) => {
   try {
     // 从请求体中解构筛选数据
@@ -79,6 +78,31 @@ router.post('/filtrate', async (req, res) => {
   } catch (error) {
     console.error('筛选工作时发生错误：', error);
     res.status(500).json({ error: '内部服务器错误' });
+  }
+});
+
+//我的发布页面，接口
+router.post('/jobsByUserId', async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'Missing userId in request body' });
+    }
+
+    // 查找与 userId 相关的工作岗位
+    const jobs = await Job.find({ userId }).populate('company');
+
+    if (!jobs) {
+      return res.status(404).json({ error: 'No jobs found for the given userId' });
+    }
+
+    // 在这里可以对 jobs 做进一步的处理，根据需要选择返回哪些数据
+
+    res.json({ jobs });
+  } catch (error) {
+    console.error('Error fetching jobs by userId:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

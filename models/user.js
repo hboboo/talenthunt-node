@@ -22,7 +22,14 @@ const schema = new mongoose.Schema({
   collectId: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Job'
-  }]
+  }],
+  age: String,
+  gender: String,
+  expectation: String,
+  advantage: String,
+  work: String,
+  project: String,
+  school: String
 })
 
 module.exports = mongoose.model('User', schema)

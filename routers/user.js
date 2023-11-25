@@ -198,4 +198,84 @@ router.post('/removeJobFromCollection', async function (req, res) {
   }
 });
 
+// 更新用户信息接口
+router.post('/updateUserInfo/:id', upload.single('userLogo'), async function (req, res) {
+  try {
+    const userId = req.params.id;
+
+    // 查找用户
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: '用户未找到' });
+    }
+
+    // 只有在提交的数据不为空时才更新用户信息
+    if (req.body.username !== undefined && req.body.username !== null && req.body.username !== '') {
+      user.username = req.body.username;
+    }
+
+    if (req.body.age !== undefined && req.body.age !== null && req.body.age !== '') {
+      user.age = req.body.age;
+    }
+
+    if (req.body.gender !== undefined && req.body.gender !== null && req.body.gender !== '') {
+      user.gender = req.body.gender;
+    }
+
+    if (req.body.expectation !== undefined && req.body.expectation !== null && req.body.expectation !== '') {
+      user.expectation = req.body.expectation;
+    }
+
+    if (req.body.advantage !== undefined && req.body.advantage !== null && req.body.advantage !== '') {
+      user.advantage = req.body.advantage;
+    }
+
+    if (req.body.work !== undefined && req.body.work !== null && req.body.work !== '') {
+      user.work = req.body.work;
+    }
+
+    if (req.body.project !== undefined && req.body.project !== null && req.body.project !== '') {
+      user.project = req.body.project;
+    }
+
+    if (req.body.school !== undefined && req.body.school !== null && req.body.school !== '') {
+      user.school = req.body.school;
+    }
+
+    // 处理上传的头像
+    if (req.file) {
+      user.userLogo = `/uploads/userLog/${req.file.filename}`;
+    }
+
+    // 保存更新后的用户
+    await user.save();
+
+    res.status(200).json({ message: '用户信息更新成功' });
+  } catch (error) {
+    console.error('错误', error.message);
+    res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
+
+router.post('/userInfo', async function (req, res) {
+  try {
+    const userId = req.body.userId;
+
+    // 根据userId从数据库中获取用户详细信息
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: '用户未找到' });
+    }
+
+    // 返回整个用户的数据库信息
+    res.status(200).json({ user });
+  
+  } catch (error) {
+    console.error('错误', error.message);
+    return res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
+
 module.exports = router
