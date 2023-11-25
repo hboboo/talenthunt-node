@@ -57,4 +57,29 @@ router.post('/search', async function(req, res) {
   }
 });
 
+
+//筛选岗位
+// 用于筛选工作的POST API
+router.post('/filtrate', async (req, res) => {
+  try {
+    // 从请求体中解构筛选数据
+    const { job_education, job_experience, salary } = req.body;
+
+    // 基于提供的数据构建筛选对象
+    const filters = {};
+    if (job_education) filters.job_education = job_education;
+    if (job_experience) filters.job_experience = job_experience;
+    if (salary) filters.salary = salary;
+
+    // 使用筛选条件查询数据库
+    const filteredJobs = await Job.find(filters).populate('company');
+
+    // 将筛选后的工作结果作为JSON响应返回
+    res.json(filteredJobs);
+  } catch (error) {
+    console.error('筛选工作时发生错误：', error);
+    res.status(500).json({ error: '内部服务器错误' });
+  }
+});
+
 module.exports = router
