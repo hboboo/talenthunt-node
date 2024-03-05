@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Chat = require('../models/chat')
+const User = require('../models/user')
 
 router.post('/', async (req, res) => {
   try {
@@ -77,5 +78,35 @@ router.post('/markAsRead', async (req, res) => {
   }
 });
 
+//储存简历id
+router.post('/storeResume', async (req, res) => {
+  try {
+      // 从请求体中获取两个变量
+      const { userId, resumeId } = req.body;
+
+      // 查询用户
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      // 检查简历 ID 是否已经存在于用户的 resumes 数组中
+      if (user.resumes.includes(resumeId)) {
+          return res.status(400).json({ message: 'Resume ID already exists in user resumes' });
+      }
+
+      // 将简历 ID 添加到用户的 resumes 字段中
+      user.resumes.push(resumeId);
+
+      // 保存用户
+      await user.save();
+
+      // 返回成功响应
+      res.status(200).json({ message: 'Resume stored successfully' });
+  } catch (err) {
+      console.error('Error storing resume:', err);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
 
 module.exports = router

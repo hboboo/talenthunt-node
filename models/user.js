@@ -29,7 +29,10 @@ const schema = new mongoose.Schema({
   advantage: String,
   work: String,
   project: String,
-  school: String
+  school: String,
+  resumes: [{
+    type: mongoose.Schema.Types.ObjectId
+  }]
 })
 
 module.exports = mongoose.model('User', schema)
