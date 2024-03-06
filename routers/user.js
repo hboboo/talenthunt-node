@@ -186,12 +186,14 @@ router.post('/removeJobFromCollection', async function (req, res) {
     }
 
     // 从用户的收藏列表中移除指定的工作 id
-    user.collectId = user.collectId.filter(collectId => collectId.toString() !== jobId);
-
-    // 保存更新后的用户信息
-    await user.save();
-
-    res.status(200).json({ message: '成功取消收藏' });
+    const index = user.collectId.indexOf(jobId);
+    if (index !== -1) {
+      user.collectId.splice(index, 1); // 从数组中移除指定索引的元素
+      await user.save(); // 保存更新后的用户信息
+      return res.status(200).json({ message: '成功取消收藏' });
+    } else {
+      return res.status(404).json({ message: '未找到要移除的工作 ID' });
+    }
   } catch (error) {
     console.error('错误', error.message);
     return res.status(500).json({ error: '服务器错误', message: error.message });

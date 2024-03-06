@@ -109,4 +109,50 @@ router.post('/storeResume', async (req, res) => {
   }
 });
 
+//获取对方简历
+router.post('/getUserInfo', async (req, res) => {
+  try {
+      const { userId, otherUserId } = req.body;
+
+      // 查询当前用户的信息
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      // 检查当前用户的 resumes 数组中是否包含 otherUserId
+      const foundUser = await User.findOne({ _id: userId, resumes: otherUserId });
+      if (foundUser) {
+          // 如果找到了，查询 otherUserId 的用户信息
+          const otherUser = await User.findById(otherUserId);
+          if (!otherUser) {
+              return res.status(404).json({ message: 'Other user not found' });
+          }
+          // 返回 otherUserId 的用户信息
+          res.status(200).json({ otherUser });
+      } else {
+          // 如果 resumes 数组中没有 otherUserId，返回提示结果
+          res.status(404).json({ message: 'Other user not found in resumes array' });
+      }
+  } catch (err) {
+      console.error('Error getting user info:', err);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+//删除聊天记录
+router.post('/deleteChat', async (req, res) => {
+  try {
+      const { userId, senderUserId } = req.body;
+
+      // 根据 senderUserId 和 userId 条件来查询需要删除的聊天内容
+      await Chat.deleteMany({ sender: senderUserId, receiver: userId });
+
+      res.status(200).json({ message: 'Chat messages deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting chat messages:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 module.exports = router

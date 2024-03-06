@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const Job = require('../models/job')
+const User = require('../models/user')
+const Company = require('../models/company')
 
 //首页渲染
 router.get('/', async function(req, res) {
@@ -103,6 +105,41 @@ router.post('/jobsByUserId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching jobs by userId:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// 删除岗位及关联公司信息
+router.post('/deleteJob', async function (req, res) {
+  try {
+    const { userId, jobId } = req.body;
+
+    // 检查用户是否存在
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: '用户未找到' });
+    }
+
+    // 检查岗位是否存在
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ message: '岗位未找到' });
+    }
+
+    // 检查用户是否有权限删除该岗位
+    if (job.userId.toString() !== userId) {
+      return res.status(403).json({ message: '没有权限删除该岗位' });
+    }
+
+    // 删除岗位及关联的公司信息
+    await Promise.all([
+      Job.deleteOne({ _id: jobId, userId: userId }),
+      Company.deleteOne({ _id: job.company }) // 删除关联的公司信息
+    ]);
+
+    res.status(200).json({ message: '成功删除岗位及关联的公司信息' });
+  } catch (error) {
+    console.error('错误', error.message);
+    return res.status(500).json({ error: '服务器错误', message: error.message });
   }
 });
 
