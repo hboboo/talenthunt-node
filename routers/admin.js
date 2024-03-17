@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const bcrypt = require('bcrypt')
 const path = require("path");
 const Job = require("../models/job");
 const User = require("../models/user");
 const Company = require("../models/company");
 
-const TEST_USER_ID = "655b146dabe5460953b36360";
+const TEST_USER_ID = "65f15d15dd56a1a8a1e1d447";
 
 //查找全部岗位
 router.get("/", async function (req, res) {
@@ -254,6 +255,105 @@ router.post('/search', async function(req, res) {
 
     res.send(data);
   } catch (error) {
+    res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
+
+//查找全部用户
+router.get("/users", async function (req, res) {
+  try {
+    const { pageIndex, pageSize } = req.query;
+    const users = await User.find()
+      .skip((pageIndex - 1) * pageSize)
+      .limit(pageSize);
+
+    const totalUsersCount = await User.countDocuments();
+
+    res.json({
+      data: users,
+      total: totalUsersCount,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "服务器错误", message: error.message });
+  }
+});
+
+//删除用户
+router.post('/deleteUser', async (req, res) => {
+  try {
+      const { id } = req.body; // 从请求体中获取用户 ID
+      const user = await User.findById(id);
+      if (!user) {
+          return res.status(404).json({ message: '用户未找到' });
+      }
+      // 删除用户
+      await User.deleteOne({ _id: id });
+
+      res.status(200).json({ message: '成功删除用户' });
+  } catch (error) {
+      console.error('错误', error.message);
+      return res.status(500).json({ error: '服务器错误', message: error.message });
+  }
+});
+
+
+// 设置用户存储引擎和保存目录
+const storageUser = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/userLog');
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const filename = `${file.fieldname}-${Date.now()}${ext}`; // 使用相同的命名规则
+    cb(null, filename);
+  },
+});
+
+const uploadUser = multer({ storage: storageUser });
+
+
+// 处理上传用户头像的路由
+router.post("/uploadUserLogo", uploadUser.single("userLogo"), async (req, res) => {
+  try {
+    // 获取上传的文件信息
+    const userLogo = req.file;
+
+    // 保存文件的路径，供前端访问
+    const userLogoPath = userLogo ? `/uploads/userLog/${userLogo.filename}` : "";
+
+    // 返回成功响应
+    res.status(200).json({ message: "用户头像上传成功", userLogoPath });
+  } catch (error) {
+    // 返回错误响应
+    res.status(500).json({ error: "用户头像上传失败", message: error.message });
+  }
+});
+
+
+//新增用户
+router.post('/register', async function (req, res) {
+  try {
+    const { account, password, role, username, userLogo } = req.body;
+
+    // 生成salt的强度10
+    const saltRounds = 10;
+    const salt = await bcrypt.genSaltSync(saltRounds);
+
+    // 使用salt和密码生成哈希
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      account: account,
+      password: hashedPassword,
+      role: role,
+      username: username,
+      userLogo: userLogo, // 直接使用表单中的头像路径
+    });
+
+    await newUser.save();
+    res.status(200).json({message: '注册成功'})
+  } catch (error) {
+    console.error('错误', error.message);
     res.status(500).json({ error: '服务器错误', message: error.message });
   }
 });
